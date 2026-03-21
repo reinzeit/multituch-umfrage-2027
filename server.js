@@ -97,6 +97,17 @@ app.get('/api/results', (req, res) => {
   res.json({ results: data.votes, totalVotes });
 });
 
+// Keep-alive: prevent Render free instance from sleeping
+app.get('/api/ping', (req, res) => res.json({ status: 'awake' }));
+
 app.listen(PORT, () => {
   console.log(`Umfrage laeuft auf http://localhost:${PORT}`);
+
+  // Self-ping every 14 minutes to stay awake on Render free tier
+  const RENDER_URL = process.env.RENDER_EXTERNAL_URL;
+  if (RENDER_URL) {
+    setInterval(() => {
+      fetch(`${RENDER_URL}/api/ping`).catch(() => {});
+    }, 14 * 60 * 1000);
+  }
 });
