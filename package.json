@@ -1,0 +1,12 @@
+{
+  "name": "multituch-farbenwechsel-2027",
+  "version": "1.0.0",
+  "description": "Online-Umfrage: Multituch Farbenwechsel 2027",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

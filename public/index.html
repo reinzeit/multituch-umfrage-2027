@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReinZeit - Multituch Farbenwechsel 2027</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Open Sans', Arial, sans-serif;
+      background: linear-gradient(135deg, #f3f7e8 0%, #f7f9f0 50%, #eaf2de 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(142, 181, 33, 0.1);
+      text-align: center;
+      border-top: 4px solid #8eb521;
+    }
+
+    .logo {
+      margin-bottom: 24px;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+    }
+
+    .title-badge {
+      display: inline-block;
+      background: #8eb521;
+      color: white;
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      color: #333;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .motivation-text {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      padding: 0 10px;
+    }
+
+    .color-options {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .color-option {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 16px 20px;
+      border: 3px solid #E2E2E2;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: white;
+    }
+
+    .color-option:hover {
+      border-color: #8eb521;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(142, 181, 33, 0.15);
+    }
+
+    .color-option.selected {
+      border-color: #8eb521;
+      background: #f5f8ec;
+    }
+
+    .color-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .color-circle.sand { background: #bfb093; }
+    .color-circle.grau { background: #8e8e8e; }
+    .color-circle.blau { background: #7d9bb5; }
+
+    .color-label {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      text-transform: capitalize;
+    }
+
+    .checkmark {
+      margin-left: auto;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .color-option.selected .checkmark {
+      border-color: #8eb521;
+      background: #8eb521;
+    }
+
+    .checkmark-icon {
+      display: none;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .color-option.selected .checkmark-icon {
+      display: block;
+    }
+
+    .vote-btn {
+      width: 100%;
+      padding: 16px;
+      background: #8eb521;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      letter-spacing: 0.5px;
+      font-family: 'Open Sans', Arial, sans-serif;
+    }
+
+    .vote-btn:hover:not(:disabled) {
+      background: #7a9c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(142, 181, 33, 0.3);
+    }
+
+    .vote-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Results view */
+    .results-container {
+      display: none;
+    }
+
+    .results-container.active {
+      display: block;
+    }
+
+    .vote-form.hidden {
+      display: none;
+    }
+
+    .result-item {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .result-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .result-circle.sand { background: #bfb093; }
+    .result-circle.grau { background: #8e8e8e; }
+    .result-circle.blau { background: #7d9bb5; }
+
+    .result-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      text-transform: capitalize;
+    }
+
+    .result-count {
+      margin-left: auto;
+      font-size: 16px;
+      font-weight: 700;
+      color: #8eb521;
+    }
+
+    .result-bar-bg {
+      width: 100%;
+      height: 14px;
+      background: #eee;
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .result-bar {
+      height: 100%;
+      border-radius: 7px;
+      transition: width 0.8s ease;
+      min-width: 0;
+    }
+
+    .result-bar.sand { background: #bfb093; }
+    .result-bar.grau { background: #8e8e8e; }
+    .result-bar.blau { background: #7d9bb5; }
+
+    .total-votes {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .success-msg {
+      background: #f5f8ec;
+      color: #7a9c1c;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      font-weight: 600;
+      font-size: 15px;
+      border: 1px solid #d6e4a8;
+    }
+
+    .loading {
+      padding: 60px 0;
+      color: #999;
+      font-size: 16px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 4px solid #e8e8e8;
+      border-top-color: #8eb521;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E2E2;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="logo.svg" alt="ReinZeit">
+    </div>
+    <div class="title-badge">Multituch Farbenwechsel 2027</div>
+    <p class="subtitle">Welche Farbe soll es 2027 werden?</p>
+    <p class="motivation-text">
+      Deine Meinung zaehlt! Hilf uns, die neue Trendfarbe fuer das Multituch 2027 zu bestimmen.
+      Waehle jetzt deine Lieblingsfarbe und gestalte die Zukunft unserer Produkte aktiv mit!
+    </p>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      Wird geladen...
+    </div>
+
+    <!-- Vote form -->
+    <div id="voteForm" class="vote-form hidden">
+      <div class="color-options">
+        <div class="color-option" data-color="sand" onclick="selectColor('sand')">
+          <div class="color-circle sand"></div>
+          <span class="color-label">Sand</span>
+          <div class="checkmark"><span class="checkmark-icon">&#10003;</span></div>
+        </div>
+        <div class="color-option" data-color="grau" onclick="selectColor('grau')">
+          <div class="color-circle grau"></div>
+          <span class="color-label">Grau</span>
+          <div class="checkmark"><span class="checkmark-icon">&#10003;</span></div>
+        </div>
+        <div class="color-option" data-color="blau" onclick="selectColor('blau')">
+          <div class="color-circle blau"></div>
+          <span class="color-label">Blau</span>
+          <div class="checkmark"><span class="checkmark-icon">&#10003;</span></div>
+        </div>
+      </div>
+      <button class="vote-btn" id="voteBtn" disabled onclick="submitVote()">
+        Jetzt abstimmen
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="results-container">
+      <div class="success-msg" id="successMsg">
+        Vielen Dank fuer deine Stimme! Gemeinsam gestalten wir die Zukunft.
+      </div>
+      <div id="resultBars"></div>
+      <div class="total-votes" id="totalVotes"></div>
+    </div>
+
+    <div class="footer">ReinZeit Handels GmbH &mdash; reinzeit.com</div>
+  </div>
+
+  <script>
+    let selectedColor = null;
+
+    // Generate a unique token per device/browser
+    function getDeviceToken() {
+      let token = localStorage.getItem('multituch_vote_token');
+      if (!token) {
+        token = crypto.randomUUID ? crypto.randomUUID() :
+          'xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
+        localStorage.setItem('multituch_vote_token', token);
+      }
+      return token;
+    }
+
+    function hasVotedLocally() {
+      return localStorage.getItem('multituch_voted') === 'true';
+    }
+
+    function markVotedLocally() {
+      localStorage.setItem('multituch_voted', 'true');
+    }
+
+    // Check status on load
+    async function checkStatus() {
+      const token = getDeviceToken();
+
+      // Quick local check first
+      if (hasVotedLocally()) {
+        try {
+          const res = await fetch('/api/results');
+          const data = await res.json();
+          showResults(data.results, data.totalVotes, false);
+        } catch {
+          document.getElementById('loading').textContent = 'Verbindungsfehler. Bitte Seite neu laden.';
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/status', {
+          headers: { 'X-Vote-Token': token }
+        });
+        const data = await res.json();
+
+        if (data.hasVoted) {
+          markVotedLocally();
+          showResults(data.results, data.totalVotes, false);
+        } else {
+          showVoteForm();
+        }
+      } catch {
+        document.getElementById('loading').textContent = 'Verbindungsfehler. Bitte Seite neu laden.';
+      }
+    }
+
+    function showVoteForm() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('voteForm').classList.remove('hidden');
+    }
+
+    function selectColor(color) {
+      selectedColor = color;
+      document.querySelectorAll('.color-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.color === color);
+      });
+      document.getElementById('voteBtn').disabled = false;
+    }
+
+    async function submitVote() {
+      if (!selectedColor) return;
+
+      const btn = document.getElementById('voteBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wird gesendet...';
+
+      const token = getDeviceToken();
+
+      try {
+        const res = await fetch('/api/vote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Vote-Token': token
+          },
+          body: JSON.stringify({ color: selectedColor, token })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          markVotedLocally();
+          document.getElementById('voteForm').classList.add('hidden');
+          showResults(data.results, data.totalVotes, true);
+        } else if (res.status === 403) {
+          markVotedLocally();
+          document.getElementById('voteForm').classList.add('hidden');
+          showResults(data.results, data.totalVotes, false);
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Jetzt abstimmen';
+          alert(data.error || 'Fehler bei der Abstimmung.');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Jetzt abstimmen';
+        alert('Verbindungsfehler. Bitte erneut versuchen.');
+      }
+    }
+
+    function showResults(votes, total, showSuccess) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('voteForm').classList.add('hidden');
+
+      const container = document.getElementById('results');
+      container.classList.add('active');
+
+      document.getElementById('successMsg').style.display = showSuccess ? 'block' : 'none';
+
+      const colors = [
+        { key: 'sand', label: 'Sand' },
+        { key: 'grau', label: 'Grau' },
+        { key: 'blau', label: 'Blau' }
+      ];
+
+      const maxVotes = Math.max(...Object.values(votes), 1);
+
+      let html = '';
+      colors.forEach(c => {
+        const count = votes[c.key] || 0;
+        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+
+        html += `
+          <div class="result-item">
+            <div class="result-header">
+              <div class="result-circle ${c.key}"></div>
+              <span class="result-label">${c.label}</span>
+              <span class="result-count">${count} Stimme${count !== 1 ? 'n' : ''} (${pct}%)</span>
+            </div>
+            <div class="result-bar-bg">
+              <div class="result-bar ${c.key}" style="width: 0%"></div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('resultBars').innerHTML = html;
+      document.getElementById('totalVotes').textContent = `Gesamt: ${total} Stimme${total !== 1 ? 'n' : ''}`;
+
+      // Animate bars
+      setTimeout(() => {
+        colors.forEach(c => {
+          const count = votes[c.key] || 0;
+          const barWidth = total > 0 ? (count / maxVotes) * 100 : 0;
+          const bar = document.querySelector(`.result-bar.${c.key}`);
+          if (bar) bar.style.width = barWidth + '%';
+        });
+      }, 100);
+    }
+
+    // Start
+    checkStatus();
+  </script>
+</body>
+</html>
